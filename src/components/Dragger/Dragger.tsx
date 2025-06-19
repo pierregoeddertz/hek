@@ -138,17 +138,24 @@ export default function Dragger({ children, className = '' }: DraggerProps) {
       const rawNext = translateRef.current + v * dt;
       const { min, max } = limitsRef.current;
       let next = rawNext;
+      let overscrolled = false;
       if (rawNext > max) {
+        overscrolled = true;
         next = max + (rawNext - max) * 0.3;
       } else if (rawNext < min) {
+        overscrolled = true;
         next = min + (rawNext - min) * 0.3;
       }
-      if (next === limitsRef.current.min || next === limitsRef.current.max) {
-        v = 0;
-      }
+
       setTranslate(next);
 
-      if (v !== 0) momentumRaf.current = requestAnimationFrame(step);
+      if (overscrolled) {
+        // stop momentum and snap back
+        maybeSnapBack();
+        return;
+      }
+
+      momentumRaf.current = requestAnimationFrame(step);
     };
 
     // after momentum stops, snap back if overstretched
@@ -172,8 +179,7 @@ export default function Dragger({ children, className = '' }: DraggerProps) {
     };
 
     stopMomentum();
-    momentumRaf.current = requestAnimationFrame(step);
-    // ensure snap back when animation ends
+    // ensure snap back as fallback (in case we never overscrolled)
     setTimeout(maybeSnapBack, 400);
   };
 
