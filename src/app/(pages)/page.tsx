@@ -35,10 +35,8 @@ export default function Home() {
       <section style={{ padding: '4rem 0' }}>
         <h2 style={{ marginBottom: 'var(--v_2)' }}>Draggable Showcase</h2>
         <Dragger>
-          {[...Array(40)].map((_, i) => (
-            <Button key={i} style={{ minWidth: 120 }}>
-              Btn {i + 1}
-            </Button>
+          {["vercel.svg", "globe.svg", "window.svg", "next.svg", "file.svg", "vercel.svg"].map((src, i) => (
+            <img key={i} src={`/${src}`} alt={src} style={{ width: 200, height: 120, objectFit: 'contain' }} />
           ))}
         </Dragger>
       </section>
