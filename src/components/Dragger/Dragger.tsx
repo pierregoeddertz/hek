@@ -120,67 +120,85 @@ export default function Dragger({ children, className = '' }: DraggerProps) {
     // cap velocity to avoid crazy values
     v = Math.max(Math.min(v, 5000), -5000);
 
-    // constant deceleration for more native feel
-    const decel = 3500; // px per sec² – höher => stoppt schneller
-    const sign = Math.sign(v) || 1;
+    // iOS-style momentum with exponential decay
+    const friction = 0.95; // closer to 1 = longer momentum
     let lastTs = performance.now();
 
     const step = (now: number) => {
       const dt = (now - lastTs) / 1000; // seconds
       lastTs = now;
 
-      v -= sign * decel * dt;
+      // exponential decay
+      v *= Math.pow(friction, dt * 60); // normalize to 60fps
 
-      // stop when velocity reversed or nearly zero
-      if (sign * v <= 10) return;
+      // stop when very slow
+      if (Math.abs(v) < 5) {
+        snapBackIfNeeded();
+        return;
+      }
 
-      // elastic overscroll during momentum
-      const rawNext = translateRef.current + v * dt;
+      const current = translateRef.current;
       const { min, max } = limitsRef.current;
-      let next = rawNext;
-      let overscrolled = false;
-      if (rawNext > max) {
-        overscrolled = true;
-        next = max + (rawNext - max) * 0.3;
-      } else if (rawNext < min) {
-        overscrolled = true;
-        next = min + (rawNext - min) * 0.3;
+      let next = current + v * dt;
+
+      // elastic overscroll
+      if (next > max) {
+        next = max + (next - max) * 0.3;
+        v *= 0.5; // reduce velocity when overscrolling
+      } else if (next < min) {
+        next = min + (next - min) * 0.3;
+        v *= 0.5; // reduce velocity when overscrolling
       }
 
       setTranslate(next);
 
-      if (overscrolled) {
-        // stop momentum and snap back
-        maybeSnapBack();
+      // if we're overscrolling, start snap back immediately
+      if (next > max || next < min) {
+        snapBackIfNeeded();
         return;
       }
 
       momentumRaf.current = requestAnimationFrame(step);
     };
 
-    // after momentum stops, snap back if overstretched
-    const maybeSnapBack = () => {
-      const { min, max } = limitsRef.current;
+    const snapBackIfNeeded = () => {
       const current = translateRef.current;
-      if (current >= min && current <= max) return; // inside bounds
+      const { min, max } = limitsRef.current;
+      
+      if (current >= min && current <= max) return; // already in bounds
 
-      const start = current;
-      const end = clamp(current);
-      const duration = 300;
-      const startTs = performance.now();
+      const target = clamp(current);
+      const distance = target - current;
+      const duration = Math.min(400, Math.abs(distance) * 0.8); // shorter for small distances
+      const startTime = performance.now();
+      const startPos = current;
 
-      const animate = (now: number) => {
-        const progress = Math.min(1, (now - startTs) / duration);
-        const ease = 1 - Math.pow(1 - progress, 3); // cubic ease-out
-        setTranslate(start + (end - start) * ease);
-        if (progress < 1) requestAnimationFrame(animate);
+      const snapStep = (now: number) => {
+        const elapsed = now - startTime;
+        const progress = Math.min(1, elapsed / duration);
+        
+        // iOS-like ease out curve
+        const eased = 1 - Math.pow(1 - progress, 3);
+        const pos = startPos + distance * eased;
+        
+        setTranslate(pos);
+        
+        if (progress < 1) {
+          requestAnimationFrame(snapStep);
+        }
       };
-      requestAnimationFrame(animate);
+      
+      requestAnimationFrame(snapStep);
     };
 
     stopMomentum();
-    // ensure snap back as fallback (in case we never overscrolled)
-    setTimeout(maybeSnapBack, 400);
+    
+    // only start momentum if we have significant velocity
+    if (Math.abs(v) > 10) {
+      momentumRaf.current = requestAnimationFrame(step);
+    } else {
+      snapBackIfNeeded();
+    }
   };
 
   // Wheel / trackpad handler
