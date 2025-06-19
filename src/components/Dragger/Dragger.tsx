@@ -205,7 +205,56 @@ export default function Dragger({ children, className = '' }: DraggerProps) {
   const onWheel = (e: React.WheelEvent) => {
     if (Math.abs(e.deltaX) < Math.abs(e.deltaY)) return; // ignore mostly vertical scroll
     e.preventDefault();
-    setTranslate(clamp(translateRef.current - e.deltaX));
+    
+    const current = translateRef.current;
+    const raw = current - e.deltaX;
+    const { min, max } = limitsRef.current;
+    
+    let next = raw;
+    // elastic overscroll for trackpad too
+    if (raw > max) {
+      next = max + (raw - max) * 0.3;
+    } else if (raw < min) {
+      next = min + (raw - min) * 0.3;
+    }
+    
+    setTranslate(next);
+    
+    // snap back if overscrolled
+    if (next > max || next < min) {
+      const snapBackIfNeeded = () => {
+        const current = translateRef.current;
+        const { min, max } = limitsRef.current;
+        
+        if (current >= min && current <= max) return; // already in bounds
+  
+        const target = clamp(current);
+        const distance = target - current;
+        const duration = Math.min(300, Math.abs(distance) * 0.6); // quicker for trackpad
+        const startTime = performance.now();
+        const startPos = current;
+  
+        const snapStep = (now: number) => {
+          const elapsed = now - startTime;
+          const progress = Math.min(1, elapsed / duration);
+          
+          // iOS-like ease out curve
+          const eased = 1 - Math.pow(1 - progress, 3);
+          const pos = startPos + distance * eased;
+          
+          setTranslate(pos);
+          
+          if (progress < 1) {
+            requestAnimationFrame(snapStep);
+          }
+        };
+        
+        requestAnimationFrame(snapStep);
+      };
+      
+      // short delay for trackpad feel
+      setTimeout(snapBackIfNeeded, 100);
+    }
   };
 
   // Update limits on resize/content change
