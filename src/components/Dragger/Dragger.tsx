@@ -22,7 +22,8 @@ export default function Dragger({ children, className = '' }: DraggerProps) {
 
   const dragState = useRef({ startX: 0, startTranslate: 0, dragging: false });
   const prevUserSelect = useRef<string | null>(null);
-  const velocityRef = useRef({ lastX: 0, lastTime: 0, v: 0 });
+  // collect recent move samples to compute velocity at pointer up
+  const moveSamples = useRef<{ x: number; t: number }[]>([]);
   const momentumRaf = useRef<number | null>(null);
 
   // Helper to stop running momentum animation
@@ -48,18 +49,23 @@ export default function Dragger({ children, className = '' }: DraggerProps) {
     prevUserSelect.current = document.body.style.userSelect;
     document.body.style.userSelect = 'none';
     document.body.classList.add('noHighlight');
-    velocityRef.current = { lastX: e.clientX, lastTime: performance.now(), v: 0 };
+    // reset samples
+    moveSamples.current = [{ x: e.clientX, t: performance.now() }];
   };
 
   const onPointerMove = (e: React.PointerEvent) => {
     if (!dragState.current.dragging) return;
-    const now = performance.now();
     const dx = e.clientX - dragState.current.startX;
     setTranslate(clamp(dragState.current.startTranslate + dx));
 
-    // compute velocity
-    const vx = (e.clientX - velocityRef.current.lastX) / (now - velocityRef.current.lastTime);
-    velocityRef.current = { lastX: e.clientX, lastTime: now, v: vx };
+    // keep samples for velocity calculation (last 100 ms)
+    const now = performance.now();
+    const samples = moveSamples.current;
+    samples.push({ x: e.clientX, t: now });
+    // keep only last 100ms of data
+    while (samples.length && now - samples[0].t > 100) {
+      samples.shift();
+    }
   };
 
   const endPointer = (e: React.PointerEvent) => {
@@ -68,26 +74,34 @@ export default function Dragger({ children, className = '' }: DraggerProps) {
     document.body.classList.remove('noHighlight');
     restoreSelection();
 
-    // momentum based on drag velocity
-    let v = velocityRef.current.v * 1000; // px/sec
-    const decel = 2500; // px/sec^2 – higher => stops quicker
+    // compute velocity from samples (px/sec)
+    const samples = moveSamples.current;
+    let v = 0;
+    if (samples.length >= 2) {
+      const first = samples[0];
+      const last = samples[samples.length - 1];
+      const dt = last.t - first.t;
+      if (dt > 0) v = ((last.x - first.x) / dt) * 1000;
+    }
 
-    const sign = Math.sign(v) || 1;
+    // cap velocity to avoid crazy values
+    v = Math.max(Math.min(v, 4000), -4000);
+
+    const friction = 0.92; // closer to 1 → longer glide
     let lastTs = performance.now();
 
     const step = (now: number) => {
-      const dt = (now - lastTs) / 1000; // seconds
+      const dt = now - lastTs; // ms
       lastTs = now;
 
-      // Apply constant deceleration opposite to velocity direction
-      v -= sign * decel * dt;
+      // exponential decay adjusted for variable frame time
+      const frameFriction = Math.pow(friction, dt / 16.67);
+      v *= frameFriction;
 
-      // If velocity crossed zero -> stop
-      if (sign * v <= 0) return;
+      if (Math.abs(v) < 5) return; // stop when very slow
 
       setTranslate((prev) => {
-        const next = clamp(prev + v * dt);
-        // stop if hit bounds
+        const next = clamp(prev + (v * dt) / 1000);
         if (next === limitsRef.current.min || next === limitsRef.current.max) {
           v = 0;
         }
