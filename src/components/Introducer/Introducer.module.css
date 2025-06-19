@@ -1,0 +1,60 @@
+/* Introducer component */
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--v_2_5);
+  padding: calc(var(--v_4) * 2) var(--v_4);
+  max-width: 600px;
+}
+
+/* meta row */
+.meta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--v_2);
+  color: var(--z);
+}
+
+.metaSep {
+  width: 1px;
+  background: var(--m);/* fills full parent height */
+  height: 1.2em;
+}
+
+.title {
+  font-size: var(--v_6);
+  color: var(--z);
+  line-height: 133.33%;
+  letter-spacing: .99px;
+}
+
+.subtitle {
+  font-size: clamp(18px, 3vw, 28px);
+  color: var(--z);
+  opacity: 0.85;
+  max-width: 60ch;
+}
+
+/* Action row */
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--v_3);
+}
+
+/* Accordion section */
+.accordion {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.4s ease;
+}
+
+.accInner {
+  padding: var(--v_5) 0; /* top & bottom 30px, sides 0 */
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--v_2);
+}

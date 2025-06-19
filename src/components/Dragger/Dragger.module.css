@@ -1,0 +1,21 @@
+.container {
+  overflow: hidden;
+  touch-action: pan-y; /* allow vertical scroll on touch devices */
+  cursor: grab;
+}
+
+.container:active {
+  cursor: grabbing;
+}
+
+.track {
+  display: flex;
+  gap: var(--v_2);
+  will-change: transform;
+  user-select: none; /* prevent text selection during drag */
+}
+
+body.noHighlight {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+} 
