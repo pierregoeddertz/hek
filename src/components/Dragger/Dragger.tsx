@@ -25,7 +25,18 @@ export default function Dragger({ children, className = '' }: DraggerProps) {
   const velocityRef = useRef({ lastX: 0, lastTime: 0, v: 0 });
   const momentumRaf = useRef<number | null>(null);
 
+  // Helper to stop running momentum animation
+  const stopMomentum = () => {
+    if (momentumRaf.current !== null) {
+      cancelAnimationFrame(momentumRaf.current);
+      momentumRaf.current = null;
+    }
+  };
+
   const onPointerDown = (e: React.PointerEvent) => {
+    // Abort any running momentum so the next drag starts immediately
+    stopMomentum();
+
     e.preventDefault();
     dragState.current = {
       startX: e.clientX,
@@ -59,9 +70,10 @@ export default function Dragger({ children, className = '' }: DraggerProps) {
 
     // start momentum animation
     let v = velocityRef.current.v * 1000; // px per sec
-    const friction = 0.95;
+    const friction = 0.92; // lower value => quicker slowdown, feels snappier
     const step = () => {
-      if (Math.abs(v) < 10) return; // stop if very slow
+      if (Math.abs(v) < 15) return; // stop if very slow
+
       setTranslate((prev) => {
         const next = clamp(prev + v * (1 / 60));
         // reverse velocity if hit bounds
@@ -72,9 +84,11 @@ export default function Dragger({ children, className = '' }: DraggerProps) {
         }
         return next;
       });
-      if (momentumRaf.current) cancelAnimationFrame(momentumRaf.current);
+
       momentumRaf.current = requestAnimationFrame(step);
     };
+
+    stopMomentum();
     momentumRaf.current = requestAnimationFrame(step);
   };
 
