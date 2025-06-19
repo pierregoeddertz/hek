@@ -22,6 +22,8 @@ export default function Dragger({ children, className = '' }: DraggerProps) {
 
   const dragState = useRef({ startX: 0, startTranslate: 0, dragging: false });
   const prevUserSelect = useRef<string | null>(null);
+  const velocityRef = useRef({ lastX: 0, lastTime: 0, v: 0 });
+  const momentumRaf = useRef<number>();
 
   const onPointerDown = (e: React.PointerEvent) => {
     e.preventDefault();
@@ -35,12 +37,18 @@ export default function Dragger({ children, className = '' }: DraggerProps) {
     prevUserSelect.current = document.body.style.userSelect;
     document.body.style.userSelect = 'none';
     document.body.classList.add('noHighlight');
+    velocityRef.current = { lastX: e.clientX, lastTime: performance.now(), v: 0 };
   };
 
   const onPointerMove = (e: React.PointerEvent) => {
     if (!dragState.current.dragging) return;
+    const now = performance.now();
     const dx = e.clientX - dragState.current.startX;
     setTranslate(clamp(dragState.current.startTranslate + dx));
+
+    // compute velocity
+    const vx = (e.clientX - velocityRef.current.lastX) / (now - velocityRef.current.lastTime);
+    velocityRef.current = { lastX: e.clientX, lastTime: now, v: vx };
   };
 
   const endPointer = (e: React.PointerEvent) => {
@@ -48,6 +56,26 @@ export default function Dragger({ children, className = '' }: DraggerProps) {
     (e.target as HTMLElement).releasePointerCapture(e.pointerId);
     document.body.classList.remove('noHighlight');
     restoreSelection();
+
+    // start momentum animation
+    let v = velocityRef.current.v * 1000; // px per sec
+    const friction = 0.95;
+    const step = () => {
+      if (Math.abs(v) < 10) return; // stop if very slow
+      setTranslate((prev) => {
+        const next = clamp(prev + v * (1 / 60));
+        // reverse velocity if hit bounds
+        if (next === limitsRef.current.min || next === limitsRef.current.max) {
+          v = 0;
+        } else {
+          v *= friction;
+        }
+        return next;
+      });
+      if (momentumRaf.current) cancelAnimationFrame(momentumRaf.current);
+      momentumRaf.current = requestAnimationFrame(step);
+    };
+    momentumRaf.current = requestAnimationFrame(step);
   };
 
   // Wheel / trackpad handler
