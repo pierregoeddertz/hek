@@ -85,23 +85,24 @@ export default function Dragger({ children, className = '' }: DraggerProps) {
     }
 
     // cap velocity to avoid crazy values
-    v = Math.max(Math.min(v, 4000), -4000);
+    v = Math.max(Math.min(v, 5000), -5000);
 
-    const friction = 0.965; // closer to 1 → deutlich längerer Auslauf
+    // constant deceleration for more native feel
+    const decel = 3500; // px per sec² – höher => stoppt schneller
+    const sign = Math.sign(v) || 1;
     let lastTs = performance.now();
 
     const step = (now: number) => {
-      const dt = now - lastTs; // ms
+      const dt = (now - lastTs) / 1000; // seconds
       lastTs = now;
 
-      // exponential decay adjusted for variable frame time
-      const frameFriction = Math.pow(friction, dt / 16.67);
-      v *= frameFriction;
+      v -= sign * decel * dt;
 
-      if (Math.abs(v) < 2) return; // stop erst bei sehr langsamer Bewegung
+      // stop when velocity reversed or nearly zero
+      if (sign * v <= 10) return;
 
       setTranslate((prev) => {
-        const next = clamp(prev + (v * dt) / 1000);
+        const next = clamp(prev + v * dt);
         if (next === limitsRef.current.min || next === limitsRef.current.max) {
           v = 0;
         }
