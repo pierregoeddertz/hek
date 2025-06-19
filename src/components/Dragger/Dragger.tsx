@@ -57,6 +57,8 @@ export default function Dragger({ children, className = '' }: DraggerProps) {
   };
 
   const onPointerDown = (e: React.PointerEvent) => {
+    // Ignore non-primary buttons (e.button 0 = primary)
+    if (e.button !== 0) return;
     // Abort any running momentum so the next drag starts immediately
     stopMomentum();
 
@@ -76,7 +78,19 @@ export default function Dragger({ children, className = '' }: DraggerProps) {
   };
 
   const onPointerMove = (e: React.PointerEvent) => {
-    if (!dragState.current.dragging) return;
+    // ignore if no primary button pressed
+    if (e.buttons !== 1) return;
+
+    // Start drag lazily if not yet started (e.g., after context menu)
+    if (!dragState.current.dragging) {
+      dragState.current = {
+        startX: e.clientX,
+        startTranslate: translateRef.current,
+        dragging: true,
+      };
+      moveSamples.current = [{ x: e.clientX, t: performance.now() }];
+    }
+
     const dx = e.clientX - dragState.current.startX;
 
     // direct clamping without overscroll

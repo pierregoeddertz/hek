@@ -35,8 +35,15 @@ export default function Home() {
       <section style={{ padding: '4rem 0' }}>
         <h2 style={{ marginBottom: 'var(--v_2)' }}>Draggable Showcase</h2>
         <Dragger>
-          {["vercel.svg", "globe.svg", "window.svg", "next.svg", "file.svg", "vercel.svg"].map((src, i) => (
-            <img key={i} src={`/${src}`} alt={src} style={{ width: 200, height: 120, objectFit: 'contain' }} />
+          {[1,2,3,4,5,6].map((n) => (
+            <img
+              key={n}
+              src={`https://picsum.photos/seed/drag${n}/400/400`}
+              width={400}
+              height={400}
+              alt={`Image ${n}`}
+              style={{ objectFit: 'cover', borderRadius: '8px' }}
+            />
           ))}
         </Dragger>
       </section>
