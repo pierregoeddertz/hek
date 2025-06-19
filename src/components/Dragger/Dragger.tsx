@@ -11,7 +11,24 @@ export type DraggerProps = {
 export default function Dragger({ children, className = '' }: DraggerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
-  const [translate, setTranslate] = useState(0);
+  const [translate, _setTranslate] = useState(0);
+  // keep latest value in ref for direct access without re-render
+  const translateRef = useRef(0);
+
+  // throttle React state updates to once per animation frame to avoid jank
+  const rafPending = useRef<number | null>(null);
+  const latestVal = useRef(0);
+  const setTranslate = (val: number) => {
+    translateRef.current = val;
+    latestVal.current = val;
+    if (rafPending.current === null) {
+      rafPending.current = requestAnimationFrame(() => {
+        _setTranslate(latestVal.current);
+        rafPending.current = null;
+      });
+    }
+  };
+
   // store limits in ref to avoid causing re-renders
   const limitsRef = useRef({ min: 0, max: 0 });
 
@@ -41,7 +58,7 @@ export default function Dragger({ children, className = '' }: DraggerProps) {
     e.preventDefault();
     dragState.current = {
       startX: e.clientX,
-      startTranslate: translate,
+      startTranslate: translateRef.current,
       dragging: true,
     };
     (e.target as HTMLElement).setPointerCapture(e.pointerId);
@@ -56,7 +73,18 @@ export default function Dragger({ children, className = '' }: DraggerProps) {
   const onPointerMove = (e: React.PointerEvent) => {
     if (!dragState.current.dragging) return;
     const dx = e.clientX - dragState.current.startX;
-    setTranslate(clamp(dragState.current.startTranslate + dx));
+
+    // allow elastic overscroll (30% of overflow)
+    const raw = dragState.current.startTranslate + dx;
+    const { min, max } = limitsRef.current;
+    let next = raw;
+    if (raw > max) {
+      next = max + (raw - max) * 0.3;
+    } else if (raw < min) {
+      next = min + (raw - min) * 0.3;
+    }
+
+    setTranslate(next);
 
     // keep samples for velocity calculation (last 100 ms)
     const now = performance.now();
@@ -101,26 +129,54 @@ export default function Dragger({ children, className = '' }: DraggerProps) {
       // stop when velocity reversed or nearly zero
       if (sign * v <= 10) return;
 
-      setTranslate((prev) => {
-        const next = clamp(prev + v * dt);
-        if (next === limitsRef.current.min || next === limitsRef.current.max) {
-          v = 0;
-        }
-        return next;
-      });
+      // elastic overscroll during momentum
+      const rawNext = translateRef.current + v * dt;
+      const { min, max } = limitsRef.current;
+      let next = rawNext;
+      if (rawNext > max) {
+        next = max + (rawNext - max) * 0.3;
+      } else if (rawNext < min) {
+        next = min + (rawNext - min) * 0.3;
+      }
+      if (next === limitsRef.current.min || next === limitsRef.current.max) {
+        v = 0;
+      }
+      setTranslate(next);
 
       if (v !== 0) momentumRaf.current = requestAnimationFrame(step);
     };
 
+    // after momentum stops, snap back if overstretched
+    const maybeSnapBack = () => {
+      const { min, max } = limitsRef.current;
+      const current = translateRef.current;
+      if (current >= min && current <= max) return; // inside bounds
+
+      const start = current;
+      const end = clamp(current);
+      const duration = 300;
+      const startTs = performance.now();
+
+      const animate = (now: number) => {
+        const progress = Math.min(1, (now - startTs) / duration);
+        const ease = 1 - Math.pow(1 - progress, 3); // cubic ease-out
+        setTranslate(start + (end - start) * ease);
+        if (progress < 1) requestAnimationFrame(animate);
+      };
+      requestAnimationFrame(animate);
+    };
+
     stopMomentum();
     momentumRaf.current = requestAnimationFrame(step);
+    // ensure snap back when animation ends
+    setTimeout(maybeSnapBack, 400);
   };
 
   // Wheel / trackpad handler
   const onWheel = (e: React.WheelEvent) => {
     if (Math.abs(e.deltaX) < Math.abs(e.deltaY)) return; // ignore mostly vertical scroll
     e.preventDefault();
-    setTranslate((prev) => clamp(prev - e.deltaX));
+    setTranslate(clamp(translateRef.current - e.deltaX));
   };
 
   // Update limits on resize/content change
@@ -132,7 +188,7 @@ export default function Dragger({ children, className = '' }: DraggerProps) {
       const min = Math.min(0, containerWidth - trackWidth);
       limitsRef.current = { min, max };
       // ensure translate fits within new bounds
-      setTranslate((t) => clamp(t));
+      setTranslate(clamp(translateRef.current));
     };
 
     updateLimits();
