@@ -87,7 +87,7 @@ export default function Dragger({ children, className = '' }: DraggerProps) {
     // cap velocity to avoid crazy values
     v = Math.max(Math.min(v, 4000), -4000);
 
-    const friction = 0.92; // closer to 1 → longer glide
+    const friction = 0.965; // closer to 1 → deutlich längerer Auslauf
     let lastTs = performance.now();
 
     const step = (now: number) => {
@@ -98,7 +98,7 @@ export default function Dragger({ children, className = '' }: DraggerProps) {
       const frameFriction = Math.pow(friction, dt / 16.67);
       v *= frameFriction;
 
-      if (Math.abs(v) < 5) return; // stop when very slow
+      if (Math.abs(v) < 2) return; // stop erst bei sehr langsamer Bewegung
 
       setTranslate((prev) => {
         const next = clamp(prev + (v * dt) / 1000);
