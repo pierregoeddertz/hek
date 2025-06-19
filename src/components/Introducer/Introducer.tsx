@@ -15,18 +15,17 @@ export type IntroducerProps = {
   children?: ReactNode;
 };
 
-export default function Introducer({ index, label, title, subtitle, ctaLabel: _ctaLabel, ctaHref: _ctaHref = "#", children }: IntroducerProps) {
+export default function Introducer({ index, label, title, subtitle, children }: IntroducerProps) {
   // Manage accordion open state
   const [open, setOpen] = useState(false);
   const accRef = useRef<HTMLDivElement>(null);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const el = accRef.current;
     if (!el) return;
     // ensure correct height on initial render according to open state
     el.style.maxHeight = open ? `${el.scrollHeight}px` : "0px";
-  }, [children]);
+  }, [children, open]);
 
   const toggleOpen = () => {
     const el = accRef.current;
