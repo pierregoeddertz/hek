@@ -18,3 +18,10 @@
 .padding_3_4 {
   padding: var(--v_3) var(--v_4);
 } 
+
+.content {
+  width: 100%;
+  max-width: 1150px;
+  margin: 0 auto;
+  padding: 0 var(--v_4);
+} 

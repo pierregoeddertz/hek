@@ -6,9 +6,10 @@ import styles from './Dragger.module.css';
 export type DraggerProps = {
   children?: React.ReactNode;
   className?: string;
+  centerFirst?: boolean;
 };
 
-export default function Dragger({ children, className = '' }: DraggerProps) {
+export default function Dragger({ children, className = '', centerFirst = false }: DraggerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   // React state only used for occasional re-render when limits change
@@ -46,6 +47,8 @@ export default function Dragger({ children, className = '' }: DraggerProps) {
   const prevUserSelect = useRef<string | null>(null);
   // collect recent move samples to compute velocity at pointer up
   const moveSamples = useRef<{ x: number; t: number }[]>([]);
+  // timestamp of last pointer move
+  const lastMoveTs = useRef<number>(performance.now());
   const momentumRaf = useRef<number | null>(null);
 
   // Helper to stop running momentum animation
@@ -87,6 +90,7 @@ export default function Dragger({ children, className = '' }: DraggerProps) {
     const now = performance.now();
     const samples = moveSamples.current;
     samples.push({ x: e.clientX, t: now });
+    lastMoveTs.current = now;
     // keep only last 100ms of data
     while (samples.length && now - samples[0].t > 100) {
       samples.shift();
@@ -107,6 +111,12 @@ export default function Dragger({ children, className = '' }: DraggerProps) {
       const last = samples[samples.length - 1];
       const dt = last.t - first.t;
       if (dt > 0) v = ((last.x - first.x) / dt) * 1000;
+    }
+
+    // If pointer has been nearly still (>100ms) before release, suppress momentum
+    const stillFor = performance.now() - lastMoveTs.current;
+    if (stillFor > 100) {
+      v = 0;
     }
 
     // cap velocity to avoid crazy values
@@ -150,9 +160,8 @@ export default function Dragger({ children, className = '' }: DraggerProps) {
 
   // Wheel / trackpad handler (clamped, no overscroll)
   const onWheel = (e: React.WheelEvent) => {
-    if (Math.abs(e.deltaX) < 2) return; // purely vertical
+    if (Math.abs(e.deltaX) < Math.abs(e.deltaY)) return; // ignore mostly vertical scroll
     e.preventDefault();
-    e.stopPropagation();
 
     const next = clamp(translateRef.current - e.deltaX);
     setTranslate(next);
@@ -167,6 +176,19 @@ export default function Dragger({ children, className = '' }: DraggerProps) {
       const min = Math.min(0, containerWidth - trackWidth);
       limitsRef.current = { min, max };
       // ensure translate fits within new bounds
+      if (centerFirst && trackRef.current) {
+        const svgs = trackRef.current.querySelectorAll('svg');
+        const firstEl = svgs[0] as Element | undefined;
+        const lastEl = svgs[svgs.length - 1] as Element | undefined;
+        if (firstEl) {
+          const w = firstEl.getBoundingClientRect().width;
+          trackRef.current.style.paddingLeft = `calc((100vw - ${w}px) / 2)`;
+        }
+        if (lastEl) {
+          const w = lastEl.getBoundingClientRect().width;
+          trackRef.current.style.paddingRight = `calc((100vw - ${w}px) / 2)`;
+        }
+      }
       setTranslate(clamp(translateRef.current));
     };
 

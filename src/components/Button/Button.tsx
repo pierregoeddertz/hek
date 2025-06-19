@@ -72,10 +72,12 @@ export default function Button({
 
   const rowClasses = `${styles.row} ${side === "right" ? styles.right : ""}`.trim();
 
+  const labelContent = frontLabel || children || 'Button';
+
   if (!hasArm) {
     return (
       <button ref={ref} type="button" {...rest} className={combined}>
-        {frontLabel || children}
+        {labelContent}
       </button>
     );
   }
@@ -97,7 +99,7 @@ export default function Button({
               </div>
             </div>
           ) : (
-            children
+            labelContent
           )}
         </button>
       </div>
