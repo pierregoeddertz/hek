@@ -1,6 +1,7 @@
 .container {
   overflow: hidden;
-  touch-action: pan-y; /* allow vertical scroll on touch devices */
+  touch-action: none; /* disable native scrolling; we manage drag */
+  overscroll-behavior: contain; /* prevent scroll chaining to body */
   cursor: grab;
   width: 100%;
 }
@@ -11,7 +12,7 @@
 
 .track {
   padding: 0 var(--v_4);
-  display: flex;
+  display: inline-flex;
   gap: var(--v_2);
   will-change: transform;
   user-select: none; /* prevent text selection during drag */
