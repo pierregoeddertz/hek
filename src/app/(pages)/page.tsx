@@ -1,6 +1,7 @@
 import Slideshow from "@/components/Slideshow/Slideshow";
 import Introducer from "@/components/Introducer/Introducer";
 import Dragger from "@/components/Dragger/Dragger";
+import Button from "@/components/Button/Button";
 
 export default function Home() {
   return (
@@ -34,21 +35,10 @@ export default function Home() {
       <section style={{ padding: '4rem 0' }}>
         <h2 style={{ marginBottom: 'var(--v_2)' }}>Draggable Showcase</h2>
         <Dragger>
-          {[...Array(8)].map((_, i) => (
-            <div
-              key={i}
-              style={{
-                minWidth: '200px',
-                height: '120px',
-                background: '#eee',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderRadius: '8px',
-              }}
-            >
-              Card {i + 1}
-            </div>
+          {[...Array(40)].map((_, i) => (
+            <Button key={i} style={{ minWidth: 120 }}>
+              Btn {i + 1}
+            </Button>
           ))}
         </Dragger>
       </section>

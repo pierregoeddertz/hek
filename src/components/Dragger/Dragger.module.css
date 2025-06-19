@@ -2,6 +2,7 @@
   overflow: hidden;
   touch-action: pan-y; /* allow vertical scroll on touch devices */
   cursor: grab;
+  width: 100%;
 }
 
 .container:active {
@@ -9,6 +10,7 @@
 }
 
 .track {
+  padding: 0 var(--v_4);
   display: flex;
   gap: var(--v_2);
   will-change: transform;
