@@ -11,7 +11,8 @@ export type DraggerProps = {
 export default function Dragger({ children, className = '' }: DraggerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
-  const [translate, _setTranslate] = useState(0);
+  // React state only used for occasional re-render when limits change
+  const [, _force] = useState({});
   // keep latest value in ref for direct access without re-render
   const translateRef = useRef(0);
 
@@ -21,9 +22,13 @@ export default function Dragger({ children, className = '' }: DraggerProps) {
   const setTranslate = (val: number) => {
     translateRef.current = val;
     latestVal.current = val;
+    // apply transform immediately for buttery smoothness
+    if (trackRef.current) {
+      trackRef.current.style.transform = `translateX(${val}px)`;
+    }
     if (rafPending.current === null) {
       rafPending.current = requestAnimationFrame(() => {
-        _setTranslate(latestVal.current);
+        _force({});
         rafPending.current = null;
       });
     }
@@ -219,7 +224,7 @@ export default function Dragger({ children, className = '' }: DraggerProps) {
       onPointerCancel={endPointer}
       onWheel={onWheel}
     >
-      <div ref={trackRef} className={styles.track} style={{ transform: `translateX(${translate}px)` }}>
+      <div ref={trackRef} className={styles.track}>
         {children}
       </div>
     </div>
