@@ -79,14 +79,14 @@ export default function Dragger({ children, className = '' }: DraggerProps) {
     if (!dragState.current.dragging) return;
     const dx = e.clientX - dragState.current.startX;
 
-    // allow elastic overscroll (30% of overflow)
+    // allow elastic overscroll (15% of overflow for smoother feel)
     const raw = dragState.current.startTranslate + dx;
     const { min, max } = limitsRef.current;
     let next = raw;
     if (raw > max) {
-      next = max + (raw - max) * 0.3;
+      next = max + (raw - max) * 0.15;
     } else if (raw < min) {
-      next = min + (raw - min) * 0.3;
+      next = min + (raw - min) * 0.15;
     }
 
     setTranslate(next);
@@ -99,6 +99,43 @@ export default function Dragger({ children, className = '' }: DraggerProps) {
     while (samples.length && now - samples[0].t > 100) {
       samples.shift();
     }
+  };
+
+  // prevent multiple simultaneous snap-backs
+  const snapBackRunning = useRef(false);
+
+  const snapBackIfNeeded = () => {
+    if (snapBackRunning.current) return; // prevent multiple snap-backs
+    const current = translateRef.current;
+    const { min, max } = limitsRef.current;
+    
+    if (current >= min && current <= max) return; // already in bounds
+
+    snapBackRunning.current = true;
+    const target = clamp(current);
+    const distance = target - current;
+    const duration = Math.min(600, Math.abs(distance) * 1.2); // longer, smoother duration
+    const startTime = performance.now();
+    const startPos = current;
+
+    const snapStep = (now: number) => {
+      const elapsed = now - startTime;
+      const progress = Math.min(1, elapsed / duration);
+      
+      // smoother ease out curve (quartic)
+      const eased = 1 - Math.pow(1 - progress, 4);
+      const pos = startPos + distance * eased;
+      
+      setTranslate(pos);
+      
+      if (progress < 1) {
+        requestAnimationFrame(snapStep);
+      } else {
+        snapBackRunning.current = false;
+      }
+    };
+    
+    requestAnimationFrame(snapStep);
   };
 
   const endPointer = (e: React.PointerEvent) => {
@@ -143,10 +180,10 @@ export default function Dragger({ children, className = '' }: DraggerProps) {
 
       // elastic overscroll
       if (next > max) {
-        next = max + (next - max) * 0.3;
+        next = max + (next - max) * 0.15;
         v *= 0.5; // reduce velocity when overscrolling
       } else if (next < min) {
-        next = min + (next - min) * 0.3;
+        next = min + (next - min) * 0.15;
         v *= 0.5; // reduce velocity when overscrolling
       }
 
@@ -159,36 +196,6 @@ export default function Dragger({ children, className = '' }: DraggerProps) {
       }
 
       momentumRaf.current = requestAnimationFrame(step);
-    };
-
-    const snapBackIfNeeded = () => {
-      const current = translateRef.current;
-      const { min, max } = limitsRef.current;
-      
-      if (current >= min && current <= max) return; // already in bounds
-
-      const target = clamp(current);
-      const distance = target - current;
-      const duration = Math.min(400, Math.abs(distance) * 0.8); // shorter for small distances
-      const startTime = performance.now();
-      const startPos = current;
-
-      const snapStep = (now: number) => {
-        const elapsed = now - startTime;
-        const progress = Math.min(1, elapsed / duration);
-        
-        // iOS-like ease out curve
-        const eased = 1 - Math.pow(1 - progress, 3);
-        const pos = startPos + distance * eased;
-        
-        setTranslate(pos);
-        
-        if (progress < 1) {
-          requestAnimationFrame(snapStep);
-        }
-      };
-      
-      requestAnimationFrame(snapStep);
     };
 
     stopMomentum();
@@ -211,49 +218,19 @@ export default function Dragger({ children, className = '' }: DraggerProps) {
     const { min, max } = limitsRef.current;
     
     let next = raw;
-    // elastic overscroll for trackpad too
+    // elastic overscroll for trackpad too (15% for smoother feel)
     if (raw > max) {
-      next = max + (raw - max) * 0.3;
+      next = max + (raw - max) * 0.15;
     } else if (raw < min) {
-      next = min + (raw - min) * 0.3;
+      next = min + (raw - min) * 0.15;
     }
     
     setTranslate(next);
     
     // snap back if overscrolled
     if (next > max || next < min) {
-      const snapBackIfNeeded = () => {
-        const current = translateRef.current;
-        const { min, max } = limitsRef.current;
-        
-        if (current >= min && current <= max) return; // already in bounds
-  
-        const target = clamp(current);
-        const distance = target - current;
-        const duration = Math.min(300, Math.abs(distance) * 0.6); // quicker for trackpad
-        const startTime = performance.now();
-        const startPos = current;
-  
-        const snapStep = (now: number) => {
-          const elapsed = now - startTime;
-          const progress = Math.min(1, elapsed / duration);
-          
-          // iOS-like ease out curve
-          const eased = 1 - Math.pow(1 - progress, 3);
-          const pos = startPos + distance * eased;
-          
-          setTranslate(pos);
-          
-          if (progress < 1) {
-            requestAnimationFrame(snapStep);
-          }
-        };
-        
-        requestAnimationFrame(snapStep);
-      };
-      
       // short delay for trackpad feel
-      setTimeout(snapBackIfNeeded, 100);
+      setTimeout(snapBackIfNeeded, 150);
     }
   };
 
