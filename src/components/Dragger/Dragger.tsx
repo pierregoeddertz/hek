@@ -84,9 +84,9 @@ export default function Dragger({ children, className = '' }: DraggerProps) {
     const { min, max } = limitsRef.current;
     let next = raw;
     if (raw > max) {
-      next = max + (raw - max) * 0.35;
+      next = max + (raw - max) * 0.25;
     } else if (raw < min) {
-      next = min + (raw - min) * 0.35;
+      next = min + (raw - min) * 0.25;
     }
 
     setTranslate(next);
@@ -106,6 +106,8 @@ export default function Dragger({ children, className = '' }: DraggerProps) {
 
   const snapBackIfNeeded = () => {
     if (snapBackRunning.current) return; // prevent multiple snap-backs
+    // cancel any running momentum animation to avoid competing updates
+    stopMomentum();
     const current = translateRef.current;
     const { min, max } = limitsRef.current;
     
@@ -116,7 +118,7 @@ export default function Dragger({ children, className = '' }: DraggerProps) {
     const distance = target - current;
     const duration = Math.min(800, Math.abs(distance) * 2); // even longer, smoother duration
     const startTime = performance.now();
-    const startPos = current;
+    const startPos = clamp(current);
 
     const snapStep = (now: number) => {
       const elapsed = now - startTime;
@@ -180,10 +182,10 @@ export default function Dragger({ children, className = '' }: DraggerProps) {
 
       // elastic overscroll
       if (next > max) {
-        next = max + (next - max) * 0.35;
+        next = max + (next - max) * 0.25;
         v *= 0.5; // moderate velocity reduction
       } else if (next < min) {
-        next = min + (next - min) * 0.35;
+        next = min + (next - min) * 0.25;
         v *= 0.5;
       }
 
