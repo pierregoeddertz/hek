@@ -1,4 +1,3 @@
-import Link from "next/link";
 import styles from "./Header.module.css";
 import Button from "../Button/Button";
 import Divider from "../Decorative/Divider";

@@ -30,21 +30,11 @@ export default function Button({
   const ref = useRef<HTMLButtonElement>(null);
   useDynamicColor(ref, dynamic);
 
-  // Variant without arm (default)
-  if (!hasArm) {
-    const combined = `${styles.root} ${className}`.trim();
-    return (
-      <button ref={ref} type="button" {...rest} className={combined}>
-        {frontLabel || children}
-      </button>
-    );
-  }
-
-  /* ---------- Variant with SVG arm ---------- */
   const vectorRef = useRef<HTMLDivElement>(null);
   const pathRef = useRef<SVGPathElement>(null);
 
   const updatePath = useCallback(() => {
+    if (!hasArm) return;
     const vectorEl = vectorRef.current;
     const pathEl = pathRef.current;
     if (!vectorEl || !pathEl) return;
@@ -65,22 +55,30 @@ export default function Button({
           : `M0 ${KINK} L${w - KINK} ${KINK} L${w - 1} 0`;
     }
     pathEl.setAttribute("d", d);
-    // Arm color
     pathEl.setAttribute("stroke", "var(--m)");
-  }, [direction, side]);
+  }, [hasArm, direction, side]);
 
   useEffect(() => {
+    if (!hasArm) return;
     updatePath();
     const vectorEl = vectorRef.current;
     if (!vectorEl) return;
     const ro = new ResizeObserver(updatePath);
     ro.observe(vectorEl);
     return () => ro.disconnect();
-  }, [updatePath]);
+  }, [hasArm, updatePath]);
 
   const combined = `${styles.root} ${className}`.trim();
 
   const rowClasses = `${styles.row} ${side === "right" ? styles.right : ""}`.trim();
+
+  if (!hasArm) {
+    return (
+      <button ref={ref} type="button" {...rest} className={combined}>
+        {frontLabel || children}
+      </button>
+    );
+  }
 
   return (
     <div className={rowClasses} data-direction={direction} data-side={side}>

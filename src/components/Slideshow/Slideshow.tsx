@@ -32,7 +32,7 @@ const staticSlides: SlideContent[] = [
 ];
 
 export default function Slideshow() {
-  const [slides, setSlides] = useState<SlideContent[]>(staticSlides);
+  const slides = staticSlides;
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
 

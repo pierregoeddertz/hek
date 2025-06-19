@@ -43,12 +43,6 @@ export default function Dragger({ children, className = '' }: DraggerProps) {
     setTranslate(clamp(dragState.current.startTranslate + dx));
   };
 
-  const endDrag = (e: React.PointerEvent) => {
-    dragState.current.dragging = false;
-    (e.target as HTMLElement).releasePointerCapture(e.pointerId);
-    // restore text selection
-  };
-
   const endPointer = (e: React.PointerEvent) => {
     dragState.current.dragging = false;
     (e.target as HTMLElement).releasePointerCapture(e.pointerId);
@@ -99,7 +93,7 @@ export default function Dragger({ children, className = '' }: DraggerProps) {
       className={`${styles.container} ${className}`.trim()}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
-      onPointerUp={endDrag}
+      onPointerUp={endPointer}
       onPointerCancel={endPointer}
       onWheel={onWheel}
     >
