@@ -79,14 +79,14 @@ export default function Dragger({ children, className = '' }: DraggerProps) {
     if (!dragState.current.dragging) return;
     const dx = e.clientX - dragState.current.startX;
 
-    // allow elastic overscroll (15% of overflow for smoother feel)
+    // allow elastic overscroll (35% of overflow for noticeable bounce)
     const raw = dragState.current.startTranslate + dx;
     const { min, max } = limitsRef.current;
     let next = raw;
     if (raw > max) {
-      next = max + (raw - max) * 0.15;
+      next = max + (raw - max) * 0.35;
     } else if (raw < min) {
-      next = min + (raw - min) * 0.15;
+      next = min + (raw - min) * 0.35;
     }
 
     setTranslate(next);
@@ -114,7 +114,7 @@ export default function Dragger({ children, className = '' }: DraggerProps) {
     snapBackRunning.current = true;
     const target = clamp(current);
     const distance = target - current;
-    const duration = Math.min(600, Math.abs(distance) * 1.2); // longer, smoother duration
+    const duration = Math.min(800, Math.abs(distance) * 2); // even longer, smoother duration
     const startTime = performance.now();
     const startPos = current;
 
@@ -122,8 +122,8 @@ export default function Dragger({ children, className = '' }: DraggerProps) {
       const elapsed = now - startTime;
       const progress = Math.min(1, elapsed / duration);
       
-      // smoother ease out curve (quartic)
-      const eased = 1 - Math.pow(1 - progress, 4);
+      // very smooth bounce-like ease out
+      const eased = 1 - Math.pow(1 - progress, 5);
       const pos = startPos + distance * eased;
       
       setTranslate(pos);
@@ -180,11 +180,11 @@ export default function Dragger({ children, className = '' }: DraggerProps) {
 
       // elastic overscroll
       if (next > max) {
-        next = max + (next - max) * 0.15;
-        v *= 0.5; // reduce velocity when overscrolling
+        next = max + (next - max) * 0.35;
+        v *= 0.5; // moderate velocity reduction
       } else if (next < min) {
-        next = min + (next - min) * 0.15;
-        v *= 0.5; // reduce velocity when overscrolling
+        next = min + (next - min) * 0.35;
+        v *= 0.5;
       }
 
       setTranslate(next);
@@ -204,6 +204,7 @@ export default function Dragger({ children, className = '' }: DraggerProps) {
     if (Math.abs(v) > 10) {
       momentumRaf.current = requestAnimationFrame(step);
     } else {
+      // even without momentum, snap back if we're overscrolled from dragging
       snapBackIfNeeded();
     }
   };
@@ -214,23 +215,33 @@ export default function Dragger({ children, className = '' }: DraggerProps) {
     e.preventDefault();
     
     const current = translateRef.current;
-    const raw = current - e.deltaX;
     const { min, max } = limitsRef.current;
     
-    let next = raw;
-    // elastic overscroll for trackpad too (15% for smoother feel)
-    if (raw > max) {
-      next = max + (raw - max) * 0.15;
-    } else if (raw < min) {
-      next = min + (raw - min) * 0.15;
+    const rawPos = current - e.deltaX;
+    
+    // allow some overscroll for smoother trackpad feel
+    let next = rawPos;
+    if (rawPos > max) {
+      // only allow overscroll if we're scrolling into the boundary
+      if (e.deltaX < 0) { // scrolling right past max
+        next = max + (rawPos - max) * 0.2;
+      } else {
+        next = max;
+      }
+    } else if (rawPos < min) {
+      // only allow overscroll if we're scrolling into the boundary  
+      if (e.deltaX > 0) { // scrolling left past min
+        next = min + (rawPos - min) * 0.2;
+      } else {
+        next = min;
+      }
     }
     
     setTranslate(next);
     
     // snap back if overscrolled
     if (next > max || next < min) {
-      // short delay for trackpad feel
-      setTimeout(snapBackIfNeeded, 150);
+      setTimeout(snapBackIfNeeded, 200);
     }
   };
 
