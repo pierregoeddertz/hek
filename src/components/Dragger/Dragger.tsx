@@ -23,7 +23,7 @@ export default function Dragger({ children, className = '' }: DraggerProps) {
   const dragState = useRef({ startX: 0, startTranslate: 0, dragging: false });
   const prevUserSelect = useRef<string | null>(null);
   const velocityRef = useRef({ lastX: 0, lastTime: 0, v: 0 });
-  const momentumRaf = useRef<number>();
+  const momentumRaf = useRef<number | null>(null);
 
   const onPointerDown = (e: React.PointerEvent) => {
     e.preventDefault();
