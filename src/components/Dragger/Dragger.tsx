@@ -79,17 +79,9 @@ export default function Dragger({ children, className = '' }: DraggerProps) {
     if (!dragState.current.dragging) return;
     const dx = e.clientX - dragState.current.startX;
 
-    // allow elastic overscroll (35% of overflow for noticeable bounce)
+    // direct clamping without overscroll
     const raw = dragState.current.startTranslate + dx;
-    const { min, max } = limitsRef.current;
-    let next = raw;
-    if (raw > max) {
-      next = max + (raw - max) * 0.25;
-    } else if (raw < min) {
-      next = min + (raw - min) * 0.25;
-    }
-
-    setTranslate(next);
+    setTranslate(clamp(raw));
 
     // keep samples for velocity calculation (last 100 ms)
     const now = performance.now();
@@ -99,45 +91,6 @@ export default function Dragger({ children, className = '' }: DraggerProps) {
     while (samples.length && now - samples[0].t > 100) {
       samples.shift();
     }
-  };
-
-  // prevent multiple simultaneous snap-backs
-  const snapBackRunning = useRef(false);
-
-  const snapBackIfNeeded = () => {
-    if (snapBackRunning.current) return; // prevent multiple snap-backs
-    // cancel any running momentum animation to avoid competing updates
-    stopMomentum();
-    const current = translateRef.current;
-    const { min, max } = limitsRef.current;
-    
-    if (current >= min && current <= max) return; // already in bounds
-
-    snapBackRunning.current = true;
-    const target = clamp(current);
-    const distance = target - current;
-    const duration = Math.min(800, Math.abs(distance) * 2); // even longer, smoother duration
-    const startTime = performance.now();
-    const startPos = clamp(current);
-
-    const snapStep = (now: number) => {
-      const elapsed = now - startTime;
-      const progress = Math.min(1, elapsed / duration);
-      
-      // very smooth bounce-like ease out
-      const eased = 1 - Math.pow(1 - progress, 5);
-      const pos = startPos + distance * eased;
-      
-      setTranslate(pos);
-      
-      if (progress < 1) {
-        requestAnimationFrame(snapStep);
-      } else {
-        snapBackRunning.current = false;
-      }
-    };
-    
-    requestAnimationFrame(snapStep);
   };
 
   const endPointer = (e: React.PointerEvent) => {
@@ -170,81 +123,38 @@ export default function Dragger({ children, className = '' }: DraggerProps) {
       // exponential decay
       v *= Math.pow(friction, dt * 60); // normalize to 60fps
 
-      // stop when very slow
-      if (Math.abs(v) < 5) {
-        snapBackIfNeeded();
-        return;
-      }
-
+      // clamp within bounds and stop if hitting limits
       const current = translateRef.current;
       const { min, max } = limitsRef.current;
       let next = current + v * dt;
 
-      // elastic overscroll
       if (next > max) {
-        next = max + (next - max) * 0.25;
-        v *= 0.5; // moderate velocity reduction
+        next = max;
+        v = 0;
       } else if (next < min) {
-        next = min + (next - min) * 0.25;
-        v *= 0.5;
+        next = min;
+        v = 0;
       }
 
       setTranslate(next);
 
-      // if we're overscrolling, start snap back immediately
-      if (next > max || next < min) {
-        snapBackIfNeeded();
-        return;
-      }
-
-      momentumRaf.current = requestAnimationFrame(step);
+      if (v !== 0) momentumRaf.current = requestAnimationFrame(step);
     };
 
     stopMomentum();
     
-    // only start momentum if we have significant velocity
     if (Math.abs(v) > 10) {
       momentumRaf.current = requestAnimationFrame(step);
-    } else {
-      // even without momentum, snap back if we're overscrolled from dragging
-      snapBackIfNeeded();
     }
   };
 
-  // Wheel / trackpad handler
+  // Wheel / trackpad handler (clamped, no overscroll)
   const onWheel = (e: React.WheelEvent) => {
     if (Math.abs(e.deltaX) < Math.abs(e.deltaY)) return; // ignore mostly vertical scroll
     e.preventDefault();
-    
-    const current = translateRef.current;
-    const { min, max } = limitsRef.current;
-    
-    const rawPos = current - e.deltaX;
-    
-    // allow some overscroll for smoother trackpad feel
-    let next = rawPos;
-    if (rawPos > max) {
-      // only allow overscroll if we're scrolling into the boundary
-      if (e.deltaX < 0) { // scrolling right past max
-        next = max + (rawPos - max) * 0.2;
-      } else {
-        next = max;
-      }
-    } else if (rawPos < min) {
-      // only allow overscroll if we're scrolling into the boundary  
-      if (e.deltaX > 0) { // scrolling left past min
-        next = min + (rawPos - min) * 0.2;
-      } else {
-        next = min;
-      }
-    }
-    
+
+    const next = clamp(translateRef.current - e.deltaX);
     setTranslate(next);
-    
-    // snap back if overscrolled
-    if (next > max || next < min) {
-      setTimeout(snapBackIfNeeded, 200);
-    }
   };
 
   // Update limits on resize/content change
