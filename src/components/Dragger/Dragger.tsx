@@ -68,24 +68,33 @@ export default function Dragger({ children, className = '' }: DraggerProps) {
     document.body.classList.remove('noHighlight');
     restoreSelection();
 
-    // start momentum animation
-    let v = velocityRef.current.v * 1000; // px per sec
-    const friction = 0.92; // lower value => quicker slowdown, feels snappier
-    const step = () => {
-      if (Math.abs(v) < 15) return; // stop if very slow
+    // momentum based on drag velocity
+    let v = velocityRef.current.v * 1000; // px/sec
+    const decel = 2500; // px/sec^2 – higher => stops quicker
+
+    const sign = Math.sign(v) || 1;
+    let lastTs = performance.now();
+
+    const step = (now: number) => {
+      const dt = (now - lastTs) / 1000; // seconds
+      lastTs = now;
+
+      // Apply constant deceleration opposite to velocity direction
+      v -= sign * decel * dt;
+
+      // If velocity crossed zero -> stop
+      if (sign * v <= 0) return;
 
       setTranslate((prev) => {
-        const next = clamp(prev + v * (1 / 60));
-        // reverse velocity if hit bounds
+        const next = clamp(prev + v * dt);
+        // stop if hit bounds
         if (next === limitsRef.current.min || next === limitsRef.current.max) {
           v = 0;
-        } else {
-          v *= friction;
         }
         return next;
       });
 
-      momentumRaf.current = requestAnimationFrame(step);
+      if (v !== 0) momentumRaf.current = requestAnimationFrame(step);
     };
 
     stopMomentum();
