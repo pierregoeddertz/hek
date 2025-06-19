@@ -201,7 +201,7 @@ export default function Dragger({ children, className = '', centerFirst = false 
       ro.disconnect();
       window.removeEventListener('resize', updateLimits);
     };
-  }, []);
+  }, [centerFirst]);
 
   const restoreSelection = () => {
     if (prevUserSelect.current !== null) {

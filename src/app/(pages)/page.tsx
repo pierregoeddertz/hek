@@ -3,8 +3,6 @@ import Introducer from "@/components/Introducer/Introducer";
 import Dragger from "@/components/Dragger/Dragger";
 import Button from "@/components/Button/Button";
 
-const galleryImages = Array.from({ length: 8 }, (_, i) => `https://picsum.photos/seed/news${i}/400/400`);
-
 export default function Home() {
   return (
     <main>
