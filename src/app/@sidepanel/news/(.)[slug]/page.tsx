@@ -10,8 +10,7 @@ export default function NewsArticleSidepanel({ params }: Props) {
   const router = useRouter();
   const [open, setOpen] = useState(true);
 
-  const resolvedParams = React.use(params as any) as { slug?: string };
-  const title = decodeURIComponent(resolvedParams?.slug ?? '');
+  const title = decodeURIComponent(params.slug ?? '');
 
   useEffect(() => {
     if (!open) {

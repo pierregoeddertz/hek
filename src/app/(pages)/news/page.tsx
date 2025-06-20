@@ -38,7 +38,7 @@ const articles: Article[] = Array.from({ length: 8 }, (_, idx) => {
 export default function NewsPage() {
   const router = useRouter();
 
-  const handleCardClick = (idx: number, art: Article) => {
+  const handleCardClick = (idx: number) => {
     router.push(`/news/${idx}`);
   };
 
@@ -46,7 +46,7 @@ export default function NewsPage() {
     <main style={{ padding: '4rem 0' }}>
       <Dragger>
         {articles.map((article, idx) => (
-          <Card key={idx} {...article} onClick={() => handleCardClick(idx, article)} />
+          <Card key={idx} {...article} onClick={() => handleCardClick(idx)} />
         ))}
       </Dragger>
     </main>

@@ -10,9 +10,9 @@ import MenuModal from '@/components/Sidepanels/MenuModal';
 import React from 'react';
 
 export default function Header() {
-  const router = useRouter();
+  const _router = useRouter();
   const segments = useSelectedLayoutSegments('sidepanel');
-  const segment = segments[0];
+  const _segment = segments[0];
   const isSidepanelOpen = segments.length > 0;
 
   const [menuOpen, setMenuOpen] = React.useState(false);
