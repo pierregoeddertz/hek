@@ -1,37 +1,36 @@
 'use client';
 
-import { useSidepanel } from '@/components/Sidepanels';
-import type { SidepanelContent } from '@/types/sidepanels';
+import { useRouter, useSelectedLayoutSegments } from 'next/navigation';
+import { useRef } from 'react';
+import { useDynamicColor } from '@/utils/useDynamicColor';
 import styles from "./Header.module.css";
 import Button from "../Button/Button";
 import Divider from "../Decorative/Divider";
+import MenuModal from '@/components/Sidepanels/MenuModal';
+import React from 'react';
 
 export default function Header() {
-  const { open, close, isOpen } = useSidepanel();
+  const router = useRouter();
+  const segments = useSelectedLayoutSegments('sidepanel');
+  const segment = segments[0];
+  const isSidepanelOpen = segments.length > 0;
+
+  const [menuOpen, setMenuOpen] = React.useState(false);
+
+  const headerRef = useRef<HTMLElement>(null);
+  // Apply dynamic color only when kein Sidepanel offen
+  useDynamicColor(headerRef, !isSidepanelOpen);
 
   const handleMenuClick = () => {
-    if (isOpen) {
-      close();
+    if (menuOpen) {
+      setMenuOpen(false);
       return;
     }
-
-    const menuContent: SidepanelContent = {
-      title: 'Menü',
-      content: `
-        <nav id="site-menu">
-          <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:0.5rem;">
-            <li><a href="/">Home</a></li>
-            <li><a href="/news">News</a></li>
-          </ul>
-        </nav>
-      `
-    };
-
-    open('menu', menuContent, 'left');
+    setMenuOpen(true);
   };
 
   return (
-    <header className={styles.root}>
+    <header className={styles.root} ref={headerRef}>
       <div className="padding_3_4 flow_tb_2_5">
         <Divider />
         <div className="flow_rl_space">
@@ -41,7 +40,7 @@ export default function Header() {
               dynamic
               aria-label="Menü öffnen"
               aria-controls="site-menu"
-              aria-expanded={isOpen}
+              aria-expanded={isSidepanelOpen}
               onClick={handleMenuClick}
             >
               Menü
@@ -54,6 +53,7 @@ export default function Header() {
           </div>
         </div>
       </div>
+      <MenuModal isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
     </header>
   );
 } 

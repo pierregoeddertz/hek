@@ -2,30 +2,13 @@
 
 import Dragger from "@/components/Dragger/Dragger";
 import Button from "@/components/Button/Button";
-import { useSidepanel } from "@/components/Sidepanels";
-import type { SidepanelContent } from "@/types/sidepanels";
+import { useRouter } from 'next/navigation';
 
 export default function ServiceDragger() {
-  const { open } = useSidepanel();
+  const router = useRouter();
 
   const handleClick = (key: string) => {
-    const content: Record<string, SidepanelContent> = {
-      heizung: {
-        title: "Heizung",
-        content: `<p>Informationen zur Heiztechnik...</p>`
-      },
-      elektrik: {
-        title: "Elektrik",
-        content: `<p>Informationen zur Elektrotechnik...</p>`
-      },
-      klima: {
-        title: "Klima",
-        content: `<p>Informationen zur Klimatechnik...</p>`
-      },
-    };
-    const c = content[key];
-    if (!c) return;
-    open(key, c, "right");
+    router.push(`/${key}`, { scroll: false });
   };
 
   return (

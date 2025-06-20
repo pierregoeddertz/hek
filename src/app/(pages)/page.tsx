@@ -1,6 +1,7 @@
 import Slideshow from "@/components/Slideshow/Slideshow";
 import Introducer from "@/components/Introducer/Introducer";
 import ServiceDragger from "@/components/ServiceDragger";
+import StickyWordGallery from "@/components/StickyWordGallery";
 
 export default function Home() {
   return (
@@ -34,6 +35,9 @@ export default function Home() {
       <section style={{ padding: '4rem 0' }}>
         <ServiceDragger />
       </section>
+
+      {/* Sticky Word Gallery Section */}
+      <StickyWordGallery />
     </main>
   );
 } 

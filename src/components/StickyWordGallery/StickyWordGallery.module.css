@@ -1,0 +1,69 @@
+.wrapper {
+  position: relative;
+  min-height: 400vh;
+  width: 100%;
+}
+
+/* Fixed fullscreen background image */
+.bgImage {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  object-fit: cover;
+  z-index: 0;
+  filter: brightness(0.4);
+}
+
+/* Scrollable content */
+.contentWrapper {
+  position: relative;
+  z-index: 1;
+  color: #fff;
+}
+
+.introBlock {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 2rem;
+}
+
+.introBlock h2 {
+  font-size: 3rem;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.wordList {
+  list-style: none;
+  padding: 50vh 0; /* centers list in viewport as user scrolls */
+  margin: 0 auto;
+  max-width: 640px;
+}
+
+.wordList li {
+  font-size: 2.5rem;
+  margin: 4rem 0;
+  font-weight: 800;
+  transition: color 0.2s ease;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.wordActive {
+  color: #ffffff;
+  opacity: 1;
+}
+
+.bottomSpacer {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  padding: 0 2rem;
+} 

@@ -103,6 +103,53 @@ const Sidepanel: React.FC<SidepanelProps> = ({
     }
   }, [isOpen]);
 
+  // Prevent background scroll when sidepanel is open
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+
+    const body = document.body;
+
+    const lockScroll = () => {
+      // Already locked? skip
+      if (body.dataset.sidepanelScrollLocked === 'true') return;
+      const scrollY = window.scrollY;
+      body.dataset.sidepanelScrollY = scrollY.toString();
+      body.dataset.sidepanelScrollLocked = 'true';
+      body.style.position = 'fixed';
+      body.style.top = `-${scrollY}px`;
+      body.style.left = '0';
+      body.style.right = '0';
+      body.style.width = '100%';
+      body.style.overflowY = 'hidden';
+    };
+
+    const unlockScroll = () => {
+      if (body.dataset.sidepanelScrollLocked !== 'true') return;
+      const previousScrollY = parseInt(body.dataset.sidepanelScrollY ?? '0', 10);
+      body.style.position = '';
+      body.style.top = '';
+      body.style.left = '';
+      body.style.right = '';
+      body.style.width = '';
+      body.style.overflowY = '';
+      delete body.dataset.sidepanelScrollY;
+      delete body.dataset.sidepanelScrollLocked;
+      window.scrollTo(0, previousScrollY);
+    };
+
+    if (isOpen) {
+      lockScroll();
+    } else if (!isOpen && !shouldRender) {
+      // Panel is fully closed (animation done)
+      unlockScroll();
+    }
+
+    return () => {
+      // Cleanup on unmount
+      unlockScroll();
+    };
+  }, [isOpen, shouldRender]);
+
   const handleOverlayClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
       onClose();
@@ -117,6 +164,7 @@ const Sidepanel: React.FC<SidepanelProps> = ({
         className={`${styles.overlay} ${isVisible ? styles.overlayVisible : ""}`}
         onClick={handleOverlayClick}
         aria-hidden="true"
+        data-ignore-dynamic="true"
       />
 
       <aside
@@ -149,7 +197,11 @@ const Sidepanel: React.FC<SidepanelProps> = ({
             </div>
           ) : (
             <div id="sidepanel-content" className={styles.sidepanelContent}>
-              <div dangerouslySetInnerHTML={{ __html: sanitizeContent(content.content) }} />
+              {typeof content.content === 'string' ? (
+                <div dangerouslySetInnerHTML={{ __html: sanitizeContent(content.content) }} />
+              ) : (
+                content.content
+              )}
             </div>
           )}
         </div>

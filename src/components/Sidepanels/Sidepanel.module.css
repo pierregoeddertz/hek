@@ -3,7 +3,7 @@
   position: fixed;
   top: 0;
   bottom: 0;
-  width: var(--sidepanel-width);
+  width: 50vw; /* 50% of viewport width on larger screens */
   height: 100vh;
   background: white;
   box-shadow: 0 2px 16px rgba(0, 0, 0, 0.15);
@@ -126,5 +126,12 @@
   .sidepanel.left,
   .overlay {
     transition: none !important;
+  }
+}
+
+/* Full-width on small devices */
+@media (max-width: 700px) {
+  .sidepanel {
+    width: 100vw;
   }
 } 

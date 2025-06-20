@@ -1,25 +1,13 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  async rewrites() {
-    return [
+  images: {
+    remotePatterns: [
       {
-        source: '/menu',
-        destination: '/?panel=menu',
+        protocol: 'https',
+        hostname: 'picsum.photos',
       },
-      {
-        source: '/heizung',
-        destination: '/?panel=heizung',
-      },
-      {
-        source: '/elektrik',
-        destination: '/?panel=elektrik',
-      },
-      {
-        source: '/klima',
-        destination: '/?panel=klima',
-      },
-    ];
+    ],
   },
 };
 

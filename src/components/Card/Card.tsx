@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import styles from './Card.module.css';
 
 export type CardProps = {
@@ -46,9 +47,8 @@ export default function Card({ title, time, date, image, ratio = '4:5', classNam
           <time>{date}</time>
         </div>
       </header>
-      <div className={styles.imageWrapper} style={{ aspectRatio: aspect }}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={image} alt={title} />
+      <div className={styles.imageWrapper} style={{ aspectRatio: aspect, position: 'relative' }}>
+        <Image src={image} alt={title} fill sizes="(max-width: 600px) 90vw, 400px" style={{ objectFit: 'cover' }} />
       </div>
     </article>
   );

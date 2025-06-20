@@ -18,13 +18,22 @@ export function useDynamicColor(ref: React.RefObject<HTMLElement | null>, enable
       let target: HTMLElement | null = null;
       for (const candidate of stack) {
         if (candidate === el || el.contains(candidate)) continue;
+        if (candidate.getAttribute('data-ignore-dynamic') === 'true') continue;
         const bg = window.getComputedStyle(candidate).backgroundColor;
         if (bg && bg !== "rgba(0, 0, 0, 0)") {
           target = candidate;
           break;
         }
       }
-      if (!target) return 1;
+      if (!target) {
+        const bodyBg = window.getComputedStyle(document.body).backgroundColor;
+        const match = bodyBg.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+        if (!match) return 1;
+        const r = Number(match[1]);
+        const g = Number(match[2]);
+        const b = Number(match[3]);
+        return (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+      }
       const bg = window.getComputedStyle(target).backgroundColor;
       const match = bg.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
       if (!match) return 1;
