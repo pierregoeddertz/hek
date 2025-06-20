@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter, useSelectedLayoutSegments } from 'next/navigation';
+import { useSelectedLayoutSegments } from 'next/navigation';
 import { useRef } from 'react';
 import { useDynamicColor } from '@/utils/useDynamicColor';
 import styles from "./Header.module.css";
@@ -10,9 +10,7 @@ import MenuModal from '@/components/Sidepanels/MenuModal';
 import React from 'react';
 
 export default function Header() {
-  const _router = useRouter();
   const segments = useSelectedLayoutSegments('sidepanel');
-  const _segment = segments[0];
   const isSidepanelOpen = segments.length > 0;
 
   const [menuOpen, setMenuOpen] = React.useState(false);
