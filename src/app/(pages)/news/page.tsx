@@ -2,6 +2,8 @@
 
 import Dragger from "@/components/Dragger/Dragger";
 import Card from "@/components/Card/Card";
+import { useSidepanel } from "@/components/Sidepanels";
+import { useRouter } from "next/navigation";
 
 type Article = {
   title: string;
@@ -35,11 +37,23 @@ const articles: Article[] = Array.from({ length: 8 }, (_, idx) => {
 });
 
 export default function NewsPage() {
+  const { open } = useSidepanel();
+  const router = useRouter();
+
+  const handleCardClick = (idx: number, art: Article) => {
+    const content = {
+      title: art.title,
+      content: `<img src="${art.image}" alt="${art.title}" style="width:100%;height:auto" /><p>${art.date} ${art.time}</p>`
+    };
+    open(`news/${idx}`, content, 'right');
+    router.push(`/news/${idx}`, { scroll: false });
+  };
+
   return (
     <main style={{ padding: '4rem 0' }}>
       <Dragger>
         {articles.map((article, idx) => (
-          <Card key={idx} {...article} />
+          <Card key={idx} {...article} onClick={() => handleCardClick(idx, article)} />
         ))}
       </Dragger>
     </main>

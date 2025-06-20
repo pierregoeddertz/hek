@@ -3,6 +3,7 @@ import "./globals.css";
 import "../utils/base.css";
 import { Outfit } from "next/font/google";
 import Header from "@/components/Header/Header";
+import { SidepanelProvider } from "@/components/Sidepanels";
 
 const outfit = Outfit({ subsets: ["latin"], variable: "--font" });
 
@@ -18,8 +19,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={outfit.variable}>
-        <Header />
-        {children}
+        <SidepanelProvider>
+          <Header />
+          {children}
+        </SidepanelProvider>
       </body>
     </html>
   );
