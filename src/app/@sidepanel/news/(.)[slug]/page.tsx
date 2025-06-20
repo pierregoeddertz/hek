@@ -4,7 +4,11 @@ import Sidepanel from '@/components/Sidepanels/Sidepanel';
 import { useRouter } from 'next/navigation';
 import { getSidepanelTransitionDuration } from '@/utils/sidepanels';
 
-export default function NewsArticleSidepanel({ params }: { params: { slug: string } }) {
+type PageProps<T = Record<string, string>> = {
+  params: T;
+};
+
+export default function NewsArticleSidepanel({ params }: PageProps<{ slug: string }>) {
   const router = useRouter();
   const [open, setOpen] = useState(true);
 
