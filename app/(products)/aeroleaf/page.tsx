@@ -1,4 +1,4 @@
-import Product from '../Product'
+import Product from '../Product';
 
 export default function AeroleafPage() {
   const aeroleafData = {
@@ -9,9 +9,9 @@ export default function AeroleafPage() {
       'High efficiency energy conversion',
       'Low maintenance design',
       'Environmentally friendly operation',
-      'Scalable for various applications'
-    ]
-  }
+      'Scalable for various applications',
+    ],
+  };
 
-  return <Product {...aeroleafData} />
-} 
+  return <Product {...aeroleafData} />;
+}

@@ -1,4 +1,4 @@
-import Product from '../Product'
+import Product from '../Product';
 
 export default function SmartflowerPage() {
   const smartflowerData = {
@@ -9,9 +9,9 @@ export default function SmartflowerPage() {
       'Automatic deployment and retraction',
       'High solar panel efficiency',
       'Smart monitoring system',
-      'Weather-resistant design'
-    ]
-  }
+      'Weather-resistant design',
+    ],
+  };
 
-  return <Product {...smartflowerData} />
-} 
+  return <Product {...smartflowerData} />;
+}

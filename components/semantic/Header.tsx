@@ -9,14 +9,22 @@ export default function Header() {
           HEK
         </Link>
         <ul className={styles.navList}>
-          <li><Link href="/">Home</Link></li>
-          <li><Link href="/news">News</Link></li>
+          <li>
+            <Link href="/">Home</Link>
+          </li>
+          <li>
+            <Link href="/news">News</Link>
+          </li>
           <li>
             <span className={styles.dropdown}>
               Products
               <ul className={styles.dropdownMenu}>
-                <li><Link href="/aeroleaf">Aeroleaf</Link></li>
-                <li><Link href="/smartflower">Smartflower</Link></li>
+                <li>
+                  <Link href="/aeroleaf">Aeroleaf</Link>
+                </li>
+                <li>
+                  <Link href="/smartflower">Smartflower</Link>
+                </li>
               </ul>
             </span>
           </li>
@@ -24,4 +32,4 @@ export default function Header() {
       </nav>
     </header>
   );
-} 
+}

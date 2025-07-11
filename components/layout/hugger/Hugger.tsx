@@ -10,24 +10,19 @@ interface HuggerProps {
 
 const Hugger = React.forwardRef<HTMLDivElement, HuggerProps>(
   ({ children, className, vluMax = false, style }, ref) => {
-    const classes = [
-      styles.hugger,
-      className,
-    ]
-      .filter(Boolean)
-      .join(' ');
-    
+    const classes = [styles.hugger, className].filter(Boolean).join(' ');
+
     const combinedStyle: React.CSSProperties = { ...style };
     if (vluMax) combinedStyle.maxWidth = 'var(--vlu_max)';
-    
+
     return (
       <div ref={ref} className={classes} style={combinedStyle}>
         {children}
       </div>
     );
-  }
+  },
 );
 
 Hugger.displayName = 'Hugger';
 
-export default Hugger; 
+export default Hugger;
