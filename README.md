@@ -72,3 +72,17 @@ npm run dev
 ## License
 
 This project is private and proprietary.
+
+## Code-Qualität & Tools
+
+- **ESLint**: Linting für sauberen, konsistenten Code
+- **Prettier**: Automatische Code-Formatierung
+- **next-seo**: SEO-Defaults für bessere Auffindbarkeit
+- **Vercel Analytics**: DSGVO-freundliche Besucherstatistiken
+
+## Deployment auf Vercel
+
+1. Repository mit GitHub verbinden
+2. Auf [vercel.com](https://vercel.com/) einloggen
+3. Projekt importieren und deployen (Vercel erkennt Next.js automatisch)
+4. Analytics und Previews sind direkt aktiv
