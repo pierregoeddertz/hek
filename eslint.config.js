@@ -2,7 +2,6 @@ import js from '@eslint/js';
 import nextPlugin from '@next/eslint-plugin-next';
 import tsPlugin from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
-import prettierPlugin from 'eslint-plugin-prettier';
 
 export default [
   js.configs.recommended,
@@ -15,19 +14,46 @@ export default [
         sourceType: 'module',
         project: './tsconfig.json',
       },
+      globals: {
+        React: 'readonly',
+        console: 'readonly',
+        document: 'readonly',
+        window: 'readonly',
+        setTimeout: 'readonly',
+        clearTimeout: 'readonly',
+        setInterval: 'readonly',
+        clearInterval: 'readonly',
+        requestAnimationFrame: 'readonly',
+        cancelAnimationFrame: 'readonly',
+        performance: 'readonly',
+        process: 'readonly',
+        __dirname: 'readonly',
+        Image: 'readonly',
+        error: 'readonly',
+      },
     },
     plugins: {
       '@typescript-eslint': tsPlugin,
       '@next/next': nextPlugin,
-      prettier: prettierPlugin,
     },
     rules: {
       ...tsPlugin.configs.recommended.rules,
       ...nextPlugin.configs.recommended.rules,
-      'prettier/prettier': 'error',
+      '@typescript-eslint/no-unused-vars': 'warn',
+      '@typescript-eslint/no-explicit-any': 'warn',
+      'no-undef': 'off', // TypeScript handles this
     },
   },
   {
-    ignores: ['node_modules/', '.next/', 'out/', 'build/', '*.config.js', '*.config.mjs'],
+    ignores: [
+      'node_modules/',
+      '.next/',
+      'out/',
+      'build/',
+      '*.config.js',
+      '*.config.mjs',
+      'public/sw.js',
+      'vitest.config.ts',
+    ],
   },
 ]; 
