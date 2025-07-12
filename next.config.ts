@@ -16,6 +16,9 @@ const nextConfig: NextConfig = {
   // Compression
   compress: true,
 
+  // CSS optimization
+  optimizeFonts: true,
+
   // Security headers
   async headers() {
     return [
