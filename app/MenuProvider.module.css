@@ -1,0 +1,52 @@
+/* SEO-friendly navigation - hidden visually but available to search engines and screen readers */
+.seoNavigation {
+  position: absolute;
+  left: -9999px;
+  top: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  z-index: -1;
+}
+
+.seoNavList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.seoNavList li {
+  margin: 0;
+  padding: 0;
+}
+
+.seoNavList a {
+  color: #333;
+  text-decoration: none;
+}
+
+.seoNavList a:hover {
+  text-decoration: underline;
+}
+
+/* Nested navigation for products */
+.seoNavList ul {
+  list-style: none;
+  margin: 0;
+  padding-left: 1rem;
+}
+
+/* Ensure screen readers can access the navigation */
+@media (prefers-reduced-motion: no-preference) {
+  .seoNavigation:focus-within {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    z-index: 1000;
+    background: white;
+    border: 1px solid #ccc;
+    padding: 1rem;
+    margin: 1rem;
+  }
+} 
