@@ -10,20 +10,29 @@ if (!isSupabaseConfigured) {
   console.warn('Supabase environment variables are not configured. Database features will be disabled.');
 }
 
-// Create a mock client if Supabase is not configured
-const createMockClient = () => ({
-  from: () => ({
-    select: () => Promise.resolve({ data: [], error: null }),
-    insert: () => Promise.resolve({ data: null, error: new Error('Supabase not configured') }),
-    update: () => Promise.resolve({ data: null, error: new Error('Supabase not configured') }),
-    delete: () => Promise.resolve({ data: null, error: new Error('Supabase not configured') }),
-  }),
-  auth: {
-    signIn: () => Promise.resolve({ data: null, error: new Error('Supabase not configured') }),
-    signOut: () => Promise.resolve({ error: null }),
-    getSession: () => Promise.resolve({ data: { session: null }, error: null }),
-  },
-});
+// Create a mock client that implements the Supabase query builder pattern
+const createMockClient = () => {
+  const mockQueryBuilder = {
+    select: () => mockQueryBuilder,
+    insert: () => mockQueryBuilder,
+    update: () => mockQueryBuilder,
+    delete: () => mockQueryBuilder,
+    eq: () => mockQueryBuilder,
+    order: () => mockQueryBuilder,
+    limit: () => mockQueryBuilder,
+    single: () => Promise.resolve({ data: null, error: new Error('Supabase not configured') }),
+    then: (resolve: any) => resolve({ data: [], error: null }),
+  };
+
+  return {
+    from: () => mockQueryBuilder,
+    auth: {
+      signIn: () => Promise.resolve({ data: null, error: new Error('Supabase not configured') }),
+      signOut: () => Promise.resolve({ error: null }),
+      getSession: () => Promise.resolve({ data: { session: null }, error: null }),
+    },
+  };
+};
 
 export const supabase = isSupabaseConfigured 
   ? createClient(supabaseUrl, supabaseAnonKey)
