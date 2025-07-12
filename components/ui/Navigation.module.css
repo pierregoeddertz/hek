@@ -1,0 +1,122 @@
+.navigation {
+  padding: 1rem 0;
+}
+
+.navList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.navLink {
+  display: block;
+  padding: 1rem 1.5rem;
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.navLink:hover {
+  background: #f8f9fa;
+  color: #007bff;
+}
+
+.navLink:focus {
+  outline: 2px solid #007bff;
+  outline-offset: -2px;
+  background: #f8f9fa;
+}
+
+/* Dropdown */
+.dropdownContainer {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.dropdownButton {
+  width: 100%;
+  background: none;
+  border: none;
+  color: #333;
+  font-weight: 500;
+  padding: 1rem 1.5rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s ease;
+  text-align: left;
+  font-size: 1rem;
+}
+
+.dropdownButton:hover {
+  background: #f8f9fa;
+  color: #007bff;
+}
+
+.dropdownButton:focus {
+  outline: 2px solid #007bff;
+  outline-offset: -2px;
+  background: #f8f9fa;
+}
+
+.dropdownArrow {
+  font-size: 0.75rem;
+  transition: transform 0.2s ease;
+}
+
+.dropdownMenu {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background: #f8f9fa;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.dropdownOpen {
+  max-height: 200px;
+}
+
+.dropdownLink {
+  display: block;
+  padding: 0.75rem 2rem;
+  text-decoration: none;
+  color: #666;
+  font-weight: 400;
+  transition: all 0.2s ease;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.dropdownLink:hover {
+  background: #e9ecef;
+  color: #007bff;
+}
+
+.dropdownLink:focus {
+  outline: 2px solid #007bff;
+  outline-offset: -2px;
+  background: #e9ecef;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .navLink,
+  .dropdownButton {
+    border: 1px solid transparent;
+  }
+  
+  .navLink:hover,
+  .dropdownButton:hover {
+    border-color: #000;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .dropdownMenu {
+    transition: none;
+  }
+} 

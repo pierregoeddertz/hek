@@ -1,4 +1,7 @@
+import Hugger from '../../components/layout/hugger/Hugger';
 import styles from './Product.module.css';
+import Zoomshow from '@/components/entities/zoomshow/Zoomshow';
+import { NewsService } from '@/lib/services/news';
 
 interface ProductProps {
   productName: string;
@@ -6,22 +9,32 @@ interface ProductProps {
   features: string[];
 }
 
-export default function Product({ productName, description, features }: ProductProps) {
-  return (
-    <div className={styles.container}>
-      <h1 className={styles.title}>{productName}</h1>
-      <p className={styles.description}>{description}</p>
+// Server-side data fetching
+async function getSlideshowData() {
+  try {
+    const newsArticles = await NewsService.getSlideshowContent();
+    return newsArticles.map((article: any, index: number) => ({
+      id: article.id,
+      image: article.image_url || '',
+      title: article.title,
+      subtitle: article.subtitle,
+      index: String(index + 1).padStart(2, '0'),
+      label: article.title,
+    }));
+  } catch (error) {
+    console.error('Error fetching slideshow data:', error);
+    return [];
+  }
+}
 
-      <div className={styles.features}>
-        <h2>Features:</h2>
-        <ul className={styles.featureList}>
-          {features.map((feature, index) => (
-            <li key={index} className={styles.featureItem}>
-              {feature}
-            </li>
-          ))}
-        </ul>
-      </div>
-    </div>
+export default async function Product({ productName, description, features }: ProductProps) {
+  const slideshowData = await getSlideshowData();
+
+  return (
+    <>
+      <Hugger>
+        <Zoomshow slides={slideshowData} useDatabase={false} />
+      </Hugger>
+    </>
   );
 }

@@ -1,76 +1,97 @@
+/* Header Container */
 .header {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  z-index: 1000;
+  background: white;
   padding: 1rem;
   border-bottom: 1px solid #eee;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .nav {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   max-width: 1200px;
   margin: 0 auto;
 }
 
+.navContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Logo */
 .logo {
   font-weight: bold;
   text-decoration: none;
   color: #333;
+  font-size: 1.5rem;
+  transition: color 0.2s ease;
 }
 
-.navList {
-  display: flex;
-  list-style: none;
-  gap: 2rem;
-  margin: 0;
-  padding: 0;
+.logo:hover {
+  color: #007bff;
 }
 
-.navList a {
-  text-decoration: none;
+.logoText {
+  font-weight: 700;
+}
+
+/* Menu Button */
+.menuButton {
+  background: none;
+  border: 1px solid #ddd;
   color: #333;
-}
-
-.dropdown {
-  position: relative;
-  cursor: pointer;
-  color: #333;
-}
-
-.dropdownMenu {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  background: white;
-  border: 1px solid #eee;
-  border-radius: 4px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  list-style: none;
-  padding: 0.5rem 0;
-  margin: 0;
-  min-width: 150px;
-  opacity: 0;
-  visibility: hidden;
-  transition:
-    opacity 0.2s,
-    visibility 0.2s;
-}
-
-.dropdown:hover .dropdownMenu {
-  opacity: 1;
-  visibility: visible;
-}
-
-.dropdownMenu li {
-  padding: 0;
-}
-
-.dropdownMenu a {
-  display: block;
+  font-weight: 500;
   padding: 0.5rem 1rem;
-  text-decoration: none;
-  color: #333;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  font-size: 1rem;
 }
 
-.dropdownMenu a:hover {
-  background: #f5f5f5;
+.menuButton:hover {
+  background: #f8f9fa;
+  border-color: #007bff;
+  color: #007bff;
+}
+
+.menuButton:focus {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+  border-color: #007bff;
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+  .header {
+    padding: 0.75rem;
+  }
+  
+  .logo {
+    font-size: 1.25rem;
+  }
+  
+  .menuButton {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .header {
+    border-bottom: 2px solid #000;
+  }
+  
+  .menuButton {
+    border: 2px solid #000;
+  }
+  
+  .menuButton:hover {
+    border-color: #000;
+    background: #000;
+    color: #fff;
+  }
 }

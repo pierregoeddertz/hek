@@ -1,91 +1,126 @@
-# HEK - Next.js Project
+# HEK - Nachhaltige Energielösungen
 
-A modern Next.js application built with React 19, TypeScript, and Tailwind CSS.
+Eine moderne Next.js-Anwendung für nachhaltige Energielösungen, die innovative Produkte wie Aeroleaf und Smartflower präsentiert.
 
-## Features
+## 🚀 Features
 
-- **Next.js 15** with Turbopack for fast development
-- **React 19** with the latest features
-- **TypeScript** for type safety
-- **Tailwind CSS 4** for styling
-- **Product showcase** with individual product pages
-- **News section** for content management
-- **Responsive design** with modern UI components
+- **Moderne Tech-Stack**: Next.js 15, React 18, TypeScript
+- **Performance-Optimiert**: Image Optimization, Security Headers
+- **SEO-Optimiert**: Umfassende Metadata-Konfiguration
+- **Code-Qualität**: ESLint, Prettier
+- **Analytics**: Vercel Analytics für Besucher-Tracking
+- **Form-Handling**: React Hook Form mit Zod-Validierung
 
-## Project Structure
+## 📁 Projektstruktur
 
 ```
 hek/
-├── app/                    # Next.js app directory
-│   ├── (products)/        # Product routes
-│   ├── news/              # News section
-│   ├── products/          # Products listing
-│   └── globals.css        # Global styles
-├── components/            # Reusable components
-│   ├── layout/           # Layout components
-│   └── semantic/         # Semantic UI components
-└── public/               # Static assets
+├── app/                    # Next.js App Router
+│   ├── (products)/        # Produkt-Seiten (Route Groups)
+│   ├── news/              # News-Bereich
+│   ├── globals.css        # Globale Styles
+│   ├── layout.tsx         # Root Layout
+│   └── page.tsx           # Hauptseite
+├── components/            # Wiederverwendbare Komponenten
+│   ├── layout/           # Layout-Komponenten
+│   └── semantic/         # Semantische Komponenten
+└── public/               # Statische Assets
 ```
 
-## Getting Started
+## 🛠️ Setup
 
-### Prerequisites
+### Voraussetzungen
 
-- Node.js 18+
-- npm or yarn
+- Node.js 18+ 
+- npm oder yarn
 
 ### Installation
 
-1. Clone the repository:
-
 ```bash
+# Repository klonen
 git clone <repository-url>
 cd hek
-```
 
-2. Install dependencies:
-
-```bash
+# Dependencies installieren
 npm install
-```
 
-3. Run the development server:
-
-```bash
+# Entwicklungsserver starten
 npm run dev
 ```
 
-4. Open [http://localhost:3000](http://localhost:3000) in your browser.
+Die Anwendung ist dann unter `http://localhost:3000` verfügbar.
 
-## Available Scripts
+## 📝 Scripts
 
-- `npm run dev` - Start development server with Turbopack
-- `npm run build` - Build for production
-- `npm run start` - Start production server
-- `npm run lint` - Run ESLint
+```bash
+# Entwicklung
+npm run dev              # Entwicklungsserver starten
+npm run build           # Production Build
+npm run start           # Production Server starten
 
-## Technologies Used
+# Code-Qualität
+npm run lint            # ESLint ausführen
+npm run lint:fix        # ESLint automatisch beheben
+npm run format          # Prettier formatieren
+npm run format:check    # Prettier prüfen
+npm run type-check      # TypeScript prüfen
 
-- **Framework**: Next.js 15
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS 4
-- **React**: 19.0.0
-- **Build Tool**: Turbopack
+# Utilities
+npm run clean           # Build-Ordner löschen
+npm run check-all       # Alle Checks ausführen
+```
 
-## License
+## 🎨 Design-System
 
-This project is private and proprietary.
+Das Projekt verwendet CSS Custom Properties für konsistentes Theming:
 
-## Code-Qualität & Tools
+```css
+:root {
+  --primary-color: #007bff;
+  --primary-dark: #0056b3;
+  --secondary-color: #6c757d;
+  /* ... weitere Variablen */
+}
+```
 
-- **ESLint**: Linting für sauberen, konsistenten Code
-- **Prettier**: Automatische Code-Formatierung
-- **next-seo**: SEO-Defaults für bessere Auffindbarkeit
-- **Vercel Analytics**: DSGVO-freundliche Besucherstatistiken
+## 📦 Deployment
 
-## Deployment auf Vercel
+Das Projekt ist für Vercel optimiert:
 
-1. Repository mit GitHub verbinden
-2. Auf [vercel.com](https://vercel.com/) einloggen
-3. Projekt importieren und deployen (Vercel erkennt Next.js automatisch)
-4. Analytics und Previews sind direkt aktiv
+1. Repository mit Vercel verbinden
+2. Automatisches Deployment bei Push auf main
+3. Preview Deployments für Pull Requests
+
+## 🔧 Konfiguration
+
+### Environment Variables
+
+Erstellen Sie eine `.env.local` Datei:
+
+```env
+# Analytics (optional)
+NEXT_PUBLIC_GA_ID=your-ga-id
+```
+
+### Next.js Konfiguration
+
+Die `next.config.ts` enthält:
+- Performance-Optimierungen
+- Image Optimization
+- Security Headers
+- SEO Redirects
+
+## 🤝 Contributing
+
+1. Feature Branch erstellen: `git checkout -b feature/amazing-feature`
+2. Änderungen committen: `git commit -m 'Add amazing feature'`
+3. Branch pushen: `git push origin feature/amazing-feature`
+4. Pull Request erstellen
+
+## 📄 Lizenz
+
+Dieses Projekt ist privat und nicht zur öffentlichen Nutzung bestimmt.
+
+## 🆘 Support
+
+Bei Fragen oder Problemen wenden Sie sich an das Entwicklungsteam.

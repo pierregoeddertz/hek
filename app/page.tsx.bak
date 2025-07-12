@@ -1,0 +1,17 @@
+import styles from './page.module.css';
+import Hugger from '@/components/layout/hugger/Hugger';
+import Zoomshow from '@/components/entities/zoomshow/Zoomshow';
+
+export default function Home() {
+  return (
+    <>
+      <Hugger style={{ backgroundColor: 'purple' }}>
+        <Zoomshow />
+      </Hugger>
+
+      <Hugger section vluMax style={{ height: '100vh', backgroundColor: 'blue' }}>
+        <h1>World</h1>
+      </Hugger>
+    </>
+  );
+}

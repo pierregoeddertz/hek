@@ -1,0 +1,21 @@
+/* Shared flex director styles */
+.director {
+  display: flex;
+}
+
+.vertical {
+  flex-direction: column;
+}
+
+.horizontal {
+  flex-direction: row;
+}
+
+[data-dragger] .director {
+  will-change: transform;
+  width: max-content;
+}
+
+[data-dragger] .director > * {
+  flex-shrink: 0;
+} 

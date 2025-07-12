@@ -1,4 +1,8 @@
 :root {
+  /* Font Variable */
+  --fnt: 'Outfit', sans-serif;
+  
+  /* Spacing Variables */
   --vlu_1: 3px;
   --vlu_2: 6px;
   --vlu_3: 9px;
@@ -17,12 +21,14 @@
   --vlu_16: 48px;
   --vlu_max: 1280px;
 
+  /* Weight Variables */
   --wgt_1: 300;
 
+  /* Color Variables */
   --clr_a: #ffffff;
   --clr_m: #17171712;
   --clr_z: #171717;
-  --clr_b: #ff4d19;
+  --clr_b: #FF4D19;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -41,10 +47,10 @@
   padding: 0;
   border: none;
   outline: none;
-  font-family: var(--fnt);
+  font-family: var(--fnt, sans-serif);
   font-weight: var(--wgt_1);
   font-size: var(--vlu_5);
-  letter-spacing: 0.33px;
+  letter-spacing: .33px;
   word-spacing: normal;
   line-height: 175%;
   text-align: left;
