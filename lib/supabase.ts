@@ -12,20 +12,28 @@ if (!isSupabaseConfigured) {
 
 // Create a mock client that implements the Supabase query builder pattern
 const createMockClient = () => {
-  const mockQueryBuilder = {
-    select: () => mockQueryBuilder,
-    insert: () => mockQueryBuilder,
-    update: () => mockQueryBuilder,
-    delete: () => mockQueryBuilder,
-    eq: () => mockQueryBuilder,
-    order: () => mockQueryBuilder,
-    limit: () => mockQueryBuilder,
-    single: () => Promise.resolve({ data: null, error: new Error('Supabase not configured') }),
-    then: (resolve: any) => resolve({ data: [], error: null }),
+  const createMockQueryBuilder = () => {
+    let queryChain: any = {
+      select: () => queryChain,
+      insert: () => queryChain,
+      update: () => queryChain,
+      delete: () => queryChain,
+      eq: () => queryChain,
+      order: () => queryChain,
+      limit: () => queryChain,
+      single: () => Promise.resolve({ data: null, error: new Error('Supabase not configured') }),
+    };
+
+    // Make the query chain thenable (Promise-like)
+    queryChain.then = (resolve: any) => {
+      resolve({ data: [], error: null });
+    };
+
+    return queryChain;
   };
 
   return {
-    from: () => mockQueryBuilder,
+    from: () => createMockQueryBuilder(),
     auth: {
       signIn: () => Promise.resolve({ data: null, error: new Error('Supabase not configured') }),
       signOut: () => Promise.resolve({ error: null }),

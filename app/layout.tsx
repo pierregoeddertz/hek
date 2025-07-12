@@ -1,10 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { Analytics } from '@vercel/analytics/next';
-import Header from '@/components/semantic/Header';
 import Footer from '@/components/semantic/Footer';
-import SidePanel from '@/components/ui/SidePanel';
-import Navigation from '@/components/ui/Navigation';
 import { Outfit } from 'next/font/google';
 import Providers from './providers';
 import MenuProvider from './MenuProvider';
